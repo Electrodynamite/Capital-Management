@@ -1,0 +1,132 @@
+from PyQt5 import QtCore, QtGui, QtWidgets
+from threading import Thread
+import keyboard
+
+
+def keys_listener(key: dict | str, function: dict):
+    while True:
+        for i in key:
+            if keyboard.read_key() == key[i] or keyboard.read_key() in key[i]:
+                function[i]()
+
+
+class uiPage(object):
+    def setupUi(self, main_window):
+        main_window.setObjectName("mainWindow")
+        main_window.resize(1340, 750)
+        main_window.setMinimumSize(QtCore.QSize(1340, 750))
+        main_window.setMaximumSize(QtCore.QSize(1340, 750))
+        main_window.setSizeIncrement(QtCore.QSize(0, 0))
+        main_window.setBaseSize(QtCore.QSize(1350, 778))
+        font = QtGui.QFont()
+        font.setFamily("Calisto MT")
+        font.setPointSize(14)
+        font.setItalic(True)
+        main_window.setFont(font)
+        main_window.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("Icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        main_window.setWindowIcon(icon)
+        self.centralwidget = QtWidgets.QWidget(main_window)
+        self.centralwidget.setObjectName("centralwidget")
+        self.tab = QtWidgets.QTabWidget(self.centralwidget)
+        self.tab.setGeometry(QtCore.QRect(0, 0, 1345, 755))
+        self.tab.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
+        self.tab.setTabPosition(QtWidgets.QTabWidget.North)
+        self.tab.setTabShape(QtWidgets.QTabWidget.Rounded)
+        self.tab.setElideMode(QtCore.Qt.ElideNone)
+        self.tab.setTabBarAutoHide(False)
+        self.tab.setObjectName("tab")
+        self.main_tab = QtWidgets.QWidget()
+        self.main_tab.setObjectName("main_tab")
+        self.frame = QtWidgets.QFrame(self.main_tab)
+        self.frame.setGeometry(QtCore.QRect(0, 0, 1331, 701))
+        font = QtGui.QFont()
+        font.setFamily("Calisto MT")
+        font.setPointSize(14)
+        font.setItalic(True)
+        self.frame.setFont(font)
+        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame.setObjectName("frame")
+        self.profit_input_text_box = QtWidgets.QLineEdit(self.frame)
+        self.profit_input_text_box.setGeometry(QtCore.QRect(10, 10, 310, 50))
+        self.profit_input_text_box.setInputMask("")
+        self.profit_input_text_box.setText("")
+        self.profit_input_text_box.setObjectName("profitInput")
+        self.description_text_box = QtWidgets.QLineEdit(self.frame)
+        self.description_text_box.setGeometry(QtCore.QRect(10, 70, 310, 50))
+        self.description_text_box.setInputMask("")
+        self.description_text_box.setText("")
+        self.description_text_box.setObjectName("description")
+        self.submit_button = QtWidgets.QPushButton(self.frame)
+        self.submit_button.setGeometry(QtCore.QRect(70, 130, 190, 60))
+        self.submit_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.submit_button.setObjectName("submitBtn")
+        self.delete_text_box = QtWidgets.QLineEdit(self.frame)
+        self.delete_text_box.setEnabled(False)
+        self.delete_text_box.setGeometry(QtCore.QRect(10, 240, 311, 50))
+        self.delete_text_box.setInputMask("")
+        self.delete_text_box.setText("")
+        self.delete_text_box.setObjectName("deleteTxtbox")
+        self.delete_button = QtWidgets.QPushButton(self.frame)
+        self.delete_button.setEnabled(False)
+        self.delete_button.setGeometry(QtCore.QRect(70, 300, 190, 60))
+        self.delete_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.delete_button.setObjectName("deleteBtn")
+        self.details_text_browser = QtWidgets.QTextBrowser(self.frame)
+        self.details_text_browser.setGeometry(QtCore.QRect(339, 10, 980, 361))
+        self.details_text_browser.viewport().setProperty("cursor", QtGui.QCursor(QtCore.Qt.ArrowCursor))
+        self.details_text_browser.setDocumentTitle("")
+        self.details_text_browser.setObjectName("details")
+        self.recent_operations_text_browser = QtWidgets.QTextBrowser(self.frame)
+        self.recent_operations_text_browser.setGeometry(QtCore.QRect(10, 389, 1311, 310))
+        self.recent_operations_text_browser.viewport().setProperty("cursor", QtGui.QCursor(QtCore.Qt.ArrowCursor))
+        self.recent_operations_text_browser.setObjectName("recentOperations")
+        self.tab.addTab(self.main_tab, "")
+        self.all_operations_tab = QtWidgets.QWidget()
+        self.all_operations_tab.setObjectName("allOperations")
+        self.all_operations_text_browser = QtWidgets.QTextBrowser(self.all_operations_tab)
+        self.all_operations_text_browser.setGeometry(QtCore.QRect(10, 10, 1311, 690))
+        self.all_operations_text_browser.viewport().setProperty("cursor", QtGui.QCursor(QtCore.Qt.ArrowCursor))
+        self.all_operations_text_browser.setObjectName("allOperations")
+        self.tab.addTab(self.all_operations_tab, "")
+        main_window.setCentralWidget(self.centralwidget)
+        
+        self.retranslateUi(main_window)
+        self.tab.setCurrentIndex(0)
+        QtCore.QMetaObject.connectSlotsByName(main_window)
+
+        self.profit_input_text_box.setFocus()
+        self.setup_threads()
+
+    def setup_threads(self):
+        keys_thread = Thread(name='keys', target=keys_listener, args=({1:['enter', 'down'], 2:'up'}, {1:self.description_text_box.setFocus, 2:self.profit_input_text_box.setFocus}))
+        keys_thread.daemon = True
+        keys_thread.start()
+
+    def retranslateUi(self, mainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        mainWindow.setWindowTitle(_translate("mainWindow", "Capital Management"))
+        self.profit_input_text_box.setPlaceholderText(_translate("mainWindow", "Profit*"))
+        self.description_text_box.setPlaceholderText(_translate("mainWindow", "Description*"))
+        self.submit_button.setText(_translate("mainWindow", "Submit"))
+        self.submit_button.setShortcut(_translate("mainWindow", "Ctrl+Return"))
+        self.delete_text_box.setPlaceholderText(_translate("mainWindow", "Operation ID"))
+        self.delete_button.setText(_translate("mainWindow", "Delete operation"))
+        self.delete_button.setShortcut(_translate("mainWindow", "Ctrl+F10"))
+        self.details_text_browser.setPlaceholderText(_translate("mainWindow", "Operation details"))
+        self.recent_operations_text_browser.setPlaceholderText(_translate("mainWindow", "Recent operations"))
+        self.tab.setTabText(self.tab.indexOf(self.main_tab), _translate("mainWindow", "Main tab"))
+        self.all_operations_text_browser.setPlaceholderText(_translate("mainWindow", "All operations"))
+        self.tab.setTabText(self.tab.indexOf(self.all_operations_tab), _translate("mainWindow", "All operations"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    mainWindow = QtWidgets.QMainWindow()
+    ui = uiPage()
+    ui.setupUi(mainWindow)
+    mainWindow.show()
+    sys.exit(app.exec_())
